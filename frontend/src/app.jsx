@@ -17,32 +17,21 @@ export default function App() {
     setMessage({ type: '', text: '' });
 
     try {
-      const webhookUrl = 'https://discord.com/api/webhooks/1439256970715725957/I9XBEgk59_ZG2GXpfHglmHAkPsBLP6MO4d02OqEYEi29LOtFzslMH4G2hl8kdvDnsYjA';
-      
-      const payload = {
-        content: "Neue Game Copier Einsendung:",
-        embeds: [
-          {
-            title: "Game Copier Input",
-            description: gameId,
-            color: 5814783
-          }
-        ]
-      };
-
-      const response = await fetch(webhookUrl, {
+      const response = await fetch('http://localhost:5000/api/webhook/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ gameId })
       });
 
-      if (response.ok) {
-        setMessage({ type: 'success', text: 'Game erfolgreich gesendet! ✓' });
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage({ type: 'success', text: data.message });
         setGameId('');
       } else {
-        throw new Error('Webhook-Anfrage fehlgeschlagen');
+        throw new Error(data.message);
       }
     } catch (error) {
       setMessage({ type: 'error', text: 'Fehler beim Senden. Bitte versuche es erneut.' });
